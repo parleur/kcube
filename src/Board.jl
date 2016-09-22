@@ -23,38 +23,67 @@ module Board
     end#function Kcube
   
   end#type Kcube
-  
-  const CASE_NORMAL = 0
 
-  type Kcase
+  const KCUBE_NOCUBE = Kcube(0, (0,0,0))
+  
+  const SQUARE_NORMAL = 0
+
+  type Ksquare
 
     casetype::Integer
-    cube::Integer#0 if void, cube index otherwise
-    function Kcase()
-      new( CASE_NORMAL, 0 )
-    end#function Kcase
+    cube::Kcube
+    function Ksquare()
+      new( SQUARE_NORMAL, KCUBE_NOCUBE )
+    end#function Ksquare
 
-  end#type Kcase
+  end#type Ksquare
+
+  function ksquaregetcube!(square::Ksquare, cube::Kcube)
+    if is(square.cube,KCUBE_NOCUBE)
+      square.cube = cube
+      return true#true if no error
+    else
+      return false
+    end#if
+  end#function ksquaregetcube
 
   type KcubeGrid
     
     cubenb::Integer
-    grid::Array{Kcase, 3}# coordinate, cubeid
-    cubes::Array{Integer,1} #Direct reference to the cubes
+    grid::Array{Ksquare, 3}# coordinate, 
+    cubes::Array{Kcube,1} #Direct reference to the cubes
+    size::Tuple{Integer,Integer,Integer}
 
-    function KcubeGrid( x_size::Integer, y_size::Integer, z_size::Integer)
-      grid = Array{Any}(x_size, y_size, z_size )
-      for i in 1:x_size
-        for j in 1:y_size
-          for k in 1:z_size
-            grid[i,j,k] = Kcase()
-          end
-        end
-      end
+    function KcubeGrid( size::Tuple{Integer,Integer,Integer})
+      grid = Array{Any}(size...)
+      for i in 1:size[1]
+        for j in 1:size[2]
+          for k in 1:size[3]
+            grid[i,j,k] = Ksquare()
+          end#for
+        end#for
+      end#for
       cubes = Array{Kcube}(0)
-      new(0, grid, cubes)
+      new(0, grid, cubes, size)
     end#function KcubeGrid
   
   end#type KcubeGrid
 
+  function addcube!(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
+    if all( [1,1,1] .<= [position...] & [position...] .<= [grid.size...])
+      cubeid = length(grid.cubes) + 1
+      cube = Kcube( cubeid, position )
+      square = grid.grid[position...]
+      if ksquaregetcube!(square, cube)#Square accept the cube
+        push!(grid.cubes,cube)
+        return cubeid
+      else
+        return 0#error
+      end#if
+    else  
+      return 0#cubeid null means error
+    end#if
+  end#function addcube
+
+  export(addcube)
 end#module Board

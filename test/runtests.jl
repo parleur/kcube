@@ -2,4 +2,7 @@ using Kcube
 using Base.Test
 
 
-Board.KcubeGrid( 10,10,1 )
+grid = Board.KcubeGrid( (10,10,1) )
+
+Board.addcube!(grid, (5,5,1))
+
