@@ -1,5 +1,6 @@
 module Kcube
 
-# package code goes here
+include("Board.jl")
+export(Board)
 
 end # module
