@@ -15,11 +15,11 @@ module Board
   
     cubeid::Integer
     cubetype::Integer
-    cubeposition::Tuple{Integer, Integer, Integer}#position
-    cubeconfiguration::Tuple{Integer, Integer}#first the top face, then the front face
+    position::Tuple{Integer, Integer, Integer}#position
+    orientation::Tuple{Integer, Integer}#first the top face, then the front face
 
-    function Kcube(cubeid::Integer, cubeposition::Tuple{Integer, Integer, Integer})
-      new(cubeid, CUBE_NORMAL, cubeposition, (FACE_RED, FACE_BLUE))
+    function Kcube(cubeid::Integer, position::Tuple{Integer, Integer, Integer})
+      new(cubeid, CUBE_NORMAL, position, (FACE_RED, FACE_BLUE))
     end#function Kcube
   
   end#type Kcube
@@ -85,5 +85,128 @@ module Board
     end#if
   end#function addcube
 
-  export(addcube)
+  export(addcube!)
+  
+  const UP = UInt8(1)
+  const DOWN = UInt8(2)
+  const RIGHT = UInt8(3)
+  const LEFT = UInt8(4)
+
+  const RIGHT_ROTATION_TABLE = 
+        Dict(
+             (FACE_RED, FACE_BLACK)     =>  (FACE_GREEN, FACE_BLACK),
+             (FACE_RED, FACE_BLUE)      =>  (FACE_BLACK, FACE_BLUE),
+             (FACE_RED, FACE_GREY)      =>  (FACE_BLUE, FACE_GREY),
+             (FACE_RED, FACE_GREEN)     =>  (FACE_GREY, FACE_GREEN),
+             (FACE_YELLOW, FACE_BLACK)  =>  (FACE_BLUE, FACE_BLACK),
+             (FACE_YELLOW, FACE_BLUE)   =>  (FACE_GREY, FACE_BLUE),
+             (FACE_YELLOW, FACE_GREY)   =>  (FACE_GREEN, FACE_GREY),
+             (FACE_YELLOW, FACE_GREEN)  =>  (FACE_BLACK, FACE_GREEN),
+             (FACE_GREEN, FACE_BLACK)   =>  (FACE_YELLOW, FACE_BLACK),
+             (FACE_GREEN, FACE_RED)     =>  (FACE_BLACK, FACE_RED),
+             (FACE_GREEN, FACE_GREY)    =>  (FACE_RED, FACE_GREY),
+             (FACE_GREEN, FACE_YELLOW)  =>  (FACE_GREY, FACE_YELLOW),
+             (FACE_BLUE, FACE_BLACK)    =>  (FACE_RED, FACE_BLACK),
+             (FACE_BLUE, FACE_RED)      =>  (FACE_GREY, FACE_RED),
+             (FACE_BLUE, FACE_GREY)     =>  (FACE_YELLOW, FACE_GREY),
+             (FACE_BLUE, FACE_YELLOW)   =>  (FACE_BLACK, FACE_YELLOW),
+             (FACE_GREY, FACE_BLUE)     =>  (FACE_RED, FACE_BLUE),
+             (FACE_GREY, FACE_YELLOW)   =>  (FACE_BLUE, FACE_YELLOW),
+             (FACE_GREY, FACE_GREEN)    =>  (FACE_YELLOW, FACE_GREEN),
+             (FACE_GREY, FACE_RED)      =>  (FACE_GREEN, FACE_RED),
+             (FACE_BLACK, FACE_BLUE)    =>  (FACE_YELLOW, FACE_BLUE),
+             (FACE_BLACK, FACE_YELLOW)  =>  (FACE_GREEN, FACE_YELLOW),
+             (FACE_BLACK, FACE_GREEN)   =>  (FACE_RED, FACE_GREEN),
+             (FACE_BLACK, FACE_RED)     =>  (FACE_BLUE, FACE_RED),
+            )
+  # Then left is three time right
+  const _rr = RIGHT_ROTATION_TABLE
+  const LEFT_ROTATION_TABLE = 
+        Dict(key => _rr[_rr[_rr[key]]] for key = keys(_rr))
+
+  const UP_ROTATION_TABLE =
+        Dict(
+             (FACE_RED, FACE_BLACK)     =>    (FACE_BLACK, FACE_YELLOW),
+             (FACE_RED, FACE_BLUE)      =>    (FACE_BLUE, FACE_YELLOW),
+             (FACE_RED, FACE_GREY)      =>    (FACE_GREY, FACE_YELLOW),
+             (FACE_RED, FACE_GREEN)     =>    (FACE_GREEN, FACE_YELLOW),
+             (FACE_YELLOW, FACE_BLACK)  =>    (FACE_BLACK, FACE_RED),
+             (FACE_YELLOW, FACE_BLUE)   =>    (FACE_BLUE, FACE_RED),
+             (FACE_YELLOW, FACE_GREY)   =>    (FACE_GREY, FACE_RED),
+             (FACE_YELLOW, FACE_GREEN)  =>    (FACE_GREEN, FACE_RED),
+             (FACE_GREEN, FACE_BLACK)   =>    (FACE_BLACK, FACE_BLUE),
+             (FACE_GREEN, FACE_RED)     =>    (FACE_RED, FACE_BLUE),
+             (FACE_GREEN, FACE_GREY)    =>    (FACE_GREY, FACE_BLUE),
+             (FACE_GREEN, FACE_YELLOW)  =>    (FACE_YELLOW, FACE_BLUE),
+             (FACE_BLUE, FACE_BLACK)    =>    (FACE_BLACK, FACE_GREEN),
+             (FACE_BLUE, FACE_RED)      =>    (FACE_RED, FACE_GREEN),
+             (FACE_BLUE, FACE_GREY)     =>    (FACE_GREY, FACE_GREEN),
+             (FACE_BLUE, FACE_YELLOW)   =>    (FACE_YELLOW, FACE_GREEN),
+             (FACE_GREY, FACE_BLUE)     =>    (FACE_BLUE, FACE_BLACK),
+             (FACE_GREY, FACE_YELLOW)   =>    (FACE_YELLOW, FACE_BLACK),
+             (FACE_GREY, FACE_GREEN)    =>    (FACE_GREEN, FACE_BLACK),
+             (FACE_GREY, FACE_RED)      =>    (FACE_RED, FACE_BLACK),
+             (FACE_BLACK, FACE_BLUE)    =>    (FACE_BLUE, FACE_GREY),
+             (FACE_BLACK, FACE_YELLOW)  =>    (FACE_YELLOW, FACE_GREY),
+             (FACE_BLACK, FACE_GREEN)   =>    (FACE_GREEN, FACE_GREY),
+             (FACE_BLACK, FACE_RED)     =>    (FACE_RED, FACE_GREY),
+            )
+  # Then down is three time up
+  const _ru = UP_ROTATION_TABLE
+  const DOWN_ROTATION_TABLE = 
+        Dict(key => _ru[_ru[_ru[key]]] for key = keys(_rr))
+
+
+  function rotateupcube!(cube::Kcube)#never failing function
+    cube.orientation = UP_ROTATION_TABLE[cube.orientation]
+  end#function rotateupcube
+
+  function rotatedowncube!(cube::Kcube)#never failing function
+    cube.orientation = DOWN_ROTATION_TABLE[cube.orientation]
+  end#function rotatedowncube
+
+  function rotateleftcube!(cube::Kcube)#never failing function
+    cube.orientation = LEFT_ROTATION_TABLE[cube.orientation]
+  end#function rotateleftcube
+
+  function rotaterightcube!(cube::Kcube)#never failing function
+    cube.orientation = RIGHT_ROTATION_TABLE[cube.orientation]
+  end#function rotaterightcube
+
+  template = :(function (grid::KcubeGrid, cube::Kcube) #1
+    x,y,z = cube.position
+    x +=1 # target position
+    lx,ly,lz = grid.size  
+    lx -= 1 # limit
+    if (cube.position > (0, 0, 0)) &
+      (cube.position <= (lx,ly,lz))
+      if is(grid.grid[x,y,z].cube , KCUBE_NOCUBE)
+        grid.grid[x,y,z].cube = cube
+        grid.grid[x,y,z].cube = KCUBE_NOCUBE
+        cube.position = (x, y, z)
+        return true
+      end#if
+    end#if
+    return false
+  end#function
+ )
+  
+  ex1 = copy(template)
+  moveupcube! = eval(ex1)
+
+  ex2 = copy(template)
+  ex2.args[2].args[2] = :( x-=1 )
+  ex2.args[2].args[4] = :( lx+=1 )
+  movedowncube! = eval(ex2)
+
+  ex3 = copy(template)
+  ex3.args[2].args[2] = :( y+=1 )
+  ex3.args[2].args[4] = :( ly -= 1)
+  moverightcube! = eval(ex3)
+
+  ex4 = copy(template)
+  ex4.args[2].args[2] = :( y-=1 )
+  ex4.args[2].args[4] = :( ly += 1)
+  moveleftcube! = eval(ex4)
+
 end#module Board
