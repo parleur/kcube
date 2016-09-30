@@ -32,3 +32,9 @@ cube5 = grid.grid[1,5,1].cube
 @test !Board.moverightcube!(grid, cube3)
 @test Board.moveleftcube!(grid, cube1)
 @test !Board.moveleftcube!(grid, cube4)
+
+cursor = Board.Cursor(grid, cube1)
+@test Board.moveupcursor!(cursor)
+@test Board.movedowncursor!(cursor)
+@test Board.moverightcursor!(cursor)
+@test Board.moveleftcursor!(cursor)

@@ -191,7 +191,58 @@ module Board
             return false;
         end
       end#function
-    end
+    end#block
+  end#for
+
+  type Cursor
+  
+    position::Tuple{Integer,Integer,Integer}
+    cube::Kcube
+    grid::KcubeGrid
+
+    function Cursor(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
+      cube = grid.grid[position...].cube
+      if !is(cube, KCUBE_NOCUBE)
+        return new(position, cube, grid)
+      else
+        assert(false) #TODO can do better here
+      end#if
+    end#function Cursor
+  
+    function Cursor(grid::KcubeGrid, cube::Kcube)
+      position = cube.position
+      assert(cube in grid.cubes)
+      if !is(cube, KCUBE_NOCUBE)
+        return new(position, cube, grid)
+      else
+        assert(false) #TODO can do better here
+      end#if
+    end#function Cursor
+
+  end#type Cursor
+  
+  # create moveupcursor!, movedowncursor!, moverightcursor!, moveleftcursor!
+  for (name, changedline ) in [("up", :(x+=1)),
+                               ("down", :(x-=1)),
+                               ("right", :(y+=1)),
+                                ("left", :(y-=1))]
+    funcname = Symbol(string("move",name,"cursor!"))
+    movecube = Symbol(string("move",name,"cube!")) 
+    rotatecube = Symbol(string("rotate",name,"cube!")) 
+    @eval begin
+      function ($funcname)(cursor::Cursor)
+        grid = cursor.grid
+        x, y, z = deepcopy(cursor.position)
+        $changedline
+        if $movecube(grid, cursor.cube)
+          cursor.position = (x,y,z)
+          $rotatecube(cursor.cube)
+          return true
+        else
+          return false
+        end#if
+      end#function moveupcursor!
+    end#block
   end#for
 
 end#module Board
