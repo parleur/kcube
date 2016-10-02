@@ -1,6 +1,7 @@
 module Board
   
-  const CUBE_NORMAL = 0  
+  const CUBE_NORMAL = 1  
+  const CUBE_NOCUBE = 0
     
   # Arbitrary colors (coresponding with a cube on my desktop)
   # The order depart from a face, going altenatively bottom then right (and so on ..)
@@ -10,7 +11,20 @@ module Board
   const FACE_YELLOW = 4
   const FACE_GREEN = 5
   const FACE_BLACK = 6
+  
+  """
+      type Kcube
+      
+        cubeid::Integer
+        cubetype::Integer
+        position::Tuple{Integer, Integer, Integer}
+        orientation::Tuple{Integer, Integer}
 
+  A type representing a cube. Supposed to be instanciated inside a `KcubeGrid` using 
+  `addcube!` function.
+
+  `orientation` represent the top face, then the front face of the cube.
+  """
   type Kcube
   
     cubeid::Integer
@@ -23,11 +37,22 @@ module Board
     end#function Kcube
   
   end#type Kcube
+  
+  """
+      const KCUBE_NOCUBE
 
-  const KCUBE_NOCUBE = Kcube(0, (0,0,0))
+  The special cube, representing absence of cube, `cubeid` is 0, and `position` is 
+  `(0,0,0)`. 
+  """
+  const KCUBE_NOCUBE = Kcube(0, CUBE_NOCUBE, (0,0,0),(FACE_RED, FACE_BLUE))
   
   const SQUARE_NORMAL = 0
+  
+  """
+      type Ksquare
 
+  A square of game. Used to store square type in field `casetype`. Contains `cube`
+  """
   type Ksquare
 
     casetype::Integer
@@ -37,7 +62,12 @@ module Board
     end#function Ksquare
 
   end#type Ksquare
-
+  
+  """
+      ksquaregetcube!(square::Ksquare, cube::Kcube)
+  
+  Pop `cube` in `square` if empty, return `true` if so, `false` else.
+  """
   function ksquaregetcube!(square::Ksquare, cube::Kcube)
     if is(square.cube,KCUBE_NOCUBE)
       square.cube = cube
@@ -46,6 +76,17 @@ module Board
       return false
     end#if
   end#function ksquaregetcube
+
+  """
+      type KcubeGrid
+        
+        cubenb::Integer
+        grid::Array{Ksquare, 3}# coordinate, 
+        cubes::Array{Kcube,1} #Direct reference to the cubes
+        size::Tuple{Integer,Integer,Integer}
+  
+  The main grid, signature means.
+  """
 
   type KcubeGrid
     
@@ -68,7 +109,13 @@ module Board
     end#function KcubeGrid
   
   end#type KcubeGrid
+  
+  """
+      addcube!(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
 
+  Pop a newly instancied cube into `grid` at `position`. 
+  Return `0` if error, a `cubeid` else
+  """
   function addcube!(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
     if all( [1,1,1] .<= [position...] & [position...] .<= [grid.size...])
       cubeid = length(grid.cubes) + 1
@@ -193,7 +240,13 @@ module Board
       end#function
     end#block
   end#for
+  
 
+  """
+      type Cursor
+
+  The controled element in the game.
+  """
   type Cursor
   
     position::Tuple{Integer,Integer,Integer}
