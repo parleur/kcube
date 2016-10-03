@@ -14,12 +14,19 @@ using GLAbstraction
   Object containing model matrices.
 
   """
+
+  const IDENTITYMAT = ga.rotationmatrix_x(Float32(0.))
+
   type GLobj
     targetmodel::Mat{4,4,Float32}
     lastmodel::Mat{4,4,Float32}
     targetime::Float64# time() return Float64
     lasttime::Float64
     interpolation::Function
+
+    function GLobj()
+      new(IDENTITYMAT, IDENTITYMAT, 0., 0., linearanim)
+    end#function GLobj
   end#type GLcube
 
   # globj, movematrix, time for the animation
