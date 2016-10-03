@@ -1,4 +1,7 @@
 module Board
+
+
+  events = Array{Tuple{name::String, args::Any, value::Bool}}
   
   const CUBE_NORMAL = 1  
   const CUBE_NOCUBE = 0
@@ -31,7 +34,9 @@ module Board
     cubetype::Integer
     position::Tuple{Integer, Integer, Integer}#position
     orientation::Tuple{Integer, Integer}#first the top face, then the front face
-
+    function Kcube(cubeid::Integer, cubetype::Integer, position::Tuple{Integer,Integer,Integer},orientation::Tuple{Integer,Integer})
+      new(cubeid, cubetype, position, orientation)
+    end#function Kcube
     function Kcube(cubeid::Integer, position::Tuple{Integer, Integer, Integer})
       new(cubeid, CUBE_NORMAL, position, (FACE_RED, FACE_BLUE))
     end#function Kcube
@@ -109,7 +114,20 @@ module Board
     end#function KcubeGrid
   
   end#type KcubeGrid
-  
+
+  function firstempty(grid::KcubeGrid)
+    for i in 1:grid.size[1]
+      for j in 1:grid.size[2]
+        for k in 1:grid.size[3]
+          if grid.grid[i,j,k].cube == KCUBE_NOCUBE
+            return (i,j,k)
+          end#if
+        end#for
+      end#for
+    end#for
+    return (0,0,0)
+  end
+
   """
       addcube!(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
 
@@ -123,14 +141,27 @@ module Board
       square = grid.grid[position...]
       if ksquaregetcube!(square, cube)#Square accept the cube
         push!(grid.cubes,cube)
+        push!(events,("addcube", cube, true))
         return cubeid
-      else
-        return 0#error
       end#if
-    else  
-      return 0#cubeid null means error
     end#if
+    return 0
   end#function addcube
+
+  function addcube!(grid::KcubeGrid)
+    position = firstempty(grid)
+    if position != (0,0,0)
+      cubeid = length(grid.cubes) + 1
+      cube = Kcube(cubeid, position)
+      square = grid.grid[position...]
+      if ksquaregetcube!(square, cube)
+        push!(grid.cubes,cube)
+        push!(events,("addcube!", cube, true))
+        return cubeid
+      end#if
+    end#if
+    return 0
+  end
 
   export(addcube!)
   
@@ -233,8 +264,10 @@ module Board
             grid.grid[x,y,z].cube = cube;
             grid.grid[cube.position...].cube = KCUBE_NOCUBE;
             cube.position = (x, y, z);
+            push!(events,(string($funcname), cube, true))
             return true;
         else
+            push!(events,(string($funcname), cube, false))
             return false;
         end
       end#function
@@ -287,12 +320,18 @@ module Board
         grid = cursor.grid
         x, y, z = deepcopy(cursor.position)
         $changedline
-        if $movecube(grid, cursor.cube)
-          cursor.position = (x,y,z)
-          $rotatecube(cursor.cube)
-          return true
-        else
-          return false
+        if (all([1,1,1] .<= [x,y,z] .<= [grid.size...]))
+          if $movecube(grid, cursor.cube)
+            cursor.position = (x,y,z)
+            $rotatecube(cursor.cube)
+            push!(events,string($funcname), cube, true)
+            return true
+          else
+            cursor.position = (x,y,z)
+            cursor.cube = grid.grid[x,y,z].cube
+            push!(events,string($funcname), cube, true)
+          end#if
+          push!(events,string($funcname), cube, false)
         end#if
       end#function moveupcursor!
     end#block
