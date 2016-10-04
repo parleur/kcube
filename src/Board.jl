@@ -1,7 +1,6 @@
 module Board
 
 
-  events = Array{Tuple{name::String, args::Any, value::Bool}}
   
   const CUBE_NORMAL = 1  
   const CUBE_NOCUBE = 0
@@ -15,6 +14,8 @@ module Board
   const FACE_GREEN = 5
   const FACE_BLACK = 6
   
+  const BoardEvents = Array{Tuple{name::String, args::Any, value::Bool}}
+
   """
       type Kcube
       
@@ -99,6 +100,7 @@ module Board
     grid::Array{Ksquare, 3}# coordinate, 
     cubes::Array{Kcube,1} #Direct reference to the cubes
     size::Tuple{Integer,Integer,Integer}
+    boardevents::BoardEvents
 
     function KcubeGrid( size::Tuple{Integer,Integer,Integer})
       grid = Array{Any}(size...)
@@ -110,7 +112,8 @@ module Board
         end#for
       end#for
       cubes = Array{Kcube}(0)
-      new(0, grid, cubes, size)
+      boardevents = BoardEvents()
+      new(0, grid, cubes, size, boardevents)
     end#function KcubeGrid
   
   end#type KcubeGrid
@@ -134,14 +137,15 @@ module Board
   Pop a newly instancied cube into `grid` at `position`. 
   Return `0` if error, a `cubeid` else
   """
-  function addcube!(grid::KcubeGrid, position::Tuple{Integer,Integer,Integer})
+  function addcube!(grid::KcubeGrid,
+                    position::Tuple{Integer,Integer,Integer})
     if all( [1,1,1] .<= [position...] & [position...] .<= [grid.size...])
       cubeid = length(grid.cubes) + 1
       cube = Kcube( cubeid, position )
       square = grid.grid[position...]
       if ksquaregetcube!(square, cube)#Square accept the cube
         push!(grid.cubes,cube)
-        push!(events,("addcube", cube, true))
+        push!(grid.boardevents,("addcube!", cube, true))
         return cubeid
       end#if
     end#if
@@ -156,7 +160,7 @@ module Board
       square = grid.grid[position...]
       if ksquaregetcube!(square, cube)
         push!(grid.cubes,cube)
-        push!(events,("addcube!", cube, true))
+        push!(grid.boardevents,("addcube!", cube, true))
         return cubeid
       end#if
     end#if
@@ -264,10 +268,10 @@ module Board
             grid.grid[x,y,z].cube = cube;
             grid.grid[cube.position...].cube = KCUBE_NOCUBE;
             cube.position = (x, y, z);
-            push!(events,(string($funcname), cube, true))
+            push!(grid.boardevents,(string($funcname), cube, true))
             return true;
         else
-            push!(events,(string($funcname), cube, false))
+            push!(grid.boardevents,(string($funcname), cube, false))
             return false;
         end
       end#function
@@ -329,9 +333,9 @@ module Board
           else
             cursor.position = (x,y,z)
             cursor.cube = grid.grid[x,y,z].cube
-            push!(events,string($funcname), cube, true)
+            push!(grid.boardevents,string($funcname), cube, true)
           end#if
-          push!(events,string($funcname), cube, false)
+          push!(grid.boardevents,string($funcname), cube, false)
         end#if
       end#function moveupcursor!
     end#block
