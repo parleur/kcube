@@ -30,10 +30,15 @@ using GLAbstraction
   end#type GLcube
 
   # globj, movematrix, time for the animation
-  globaleventstack = Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1}
+  animevents = Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1}
 
   const CUBE_SIZE = Float32(1.)
   
+  const MOVEUPMAT = translationmatrix_x(CUBE_SIZE)
+  const MOVEDOWNMAT = translationmatrix_x(-CUBE_SIZE)
+  const MOVELEFTMAT = translationmatrix_y(-CUBE_SIZE)
+  const MOVERIGHTMAT = translationmatrix_y(CUBE_SIZE)
+
   const MOVECUBEUPMAT = translationmatrix_x(CUBE_SIZE) *
                         rotationmatrix_x(Float32(pi/2.))
   const MOVECUBEDOWNMAT = translationmatrix_x(-CUBE_SIZE) *
@@ -62,7 +67,7 @@ using GLAbstraction
       globj.lasttime = curtime - Δpast #the relative position in animation mustn't change
       globj.targettime = curtime + Δtime
       event = (globj, movematrix, ACCELERATION * movetime)
-      push!(globaleventstack, event)
+      push!(animevents, event)
     end#if
 
   end#function glmoveup
