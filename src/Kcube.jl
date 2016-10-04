@@ -25,7 +25,7 @@ module Kcube
     end#function key_callback   window = GLModel.create_context()
 
     fw.SetKeyCallback(window, key_callback)
-    return keymapping
+    return window, keymapping
 
   end#function init_gl
   
@@ -102,12 +102,17 @@ module Kcube
     
     for i in 1:length(animevents)
       animevent = pop!(animevents)
-      Anim.glmoveobj(animevent[1], animevent[2], animevent[3], time())
+      Anim.glmoveobj!(animevent[1], animevent[2], animevent[3], time())
     end#for
     
   end#function processanimevent!
 
-  function render(glcubes::Array{Anim.GLobj,1}, glpointer::Anim.GLobj)
+  function render(glcubes::Array{Anim.GLobj,1},
+                  glcursor::Anim.GLobj,
+                  cubero::Any,
+                  cubetrans,
+                  pointerro::Any,
+                  pointertrans )
 
     for glcube in glcubes
       modelmat = glcube.interpolation(glcube, time())
@@ -119,6 +124,7 @@ module Kcube
     modelmat = glpointer.interpolation(glpointer, time())
     mvpmat = projection*view*modelmat #TODO finish to define projection and view matrix
     push!(pointertrans, mvpmat)
+    Reactive.run_till_now()
     ga.render(pointerro)
       
   end#render
@@ -139,10 +145,26 @@ module Kcube
 
   function main()
     
-    keymaps = init_gl()
+    window, keymaps = init_gl()
     cursor, boardevents = init_board(keymaps)
     glcubes, glcursor, animevents = init_anim()
     cubero, cubetrans, pointerro, pointertrans = init_model()
+
+    while !GLFW.WindowShouldClose(window)
+        t = time()
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        gl.glClear(gl.GL_DEPTH_BUFFER_BIT)
+
+        GLFW.PollEvents()
+        processboardevent!(boardevents, animevents, glcubes, glpointer )
+        processanimevent!(animevents)
+        render( glcubes, glcursor, cubero, cubetrans, pointerro, pointertrans )
+
+        GLFW.SwapBuffers(window)
+        if GLFW.GetKey(window, GLFW.KEY_ESCAPE) == GLFW.PRESS
+            GLFW.SetWindowShouldClose(window, true)
+        end
+    end 
 
   end#function main
 

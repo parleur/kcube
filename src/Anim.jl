@@ -51,7 +51,7 @@ using GLAbstraction
   const MOVETIME = 1.
   const ACCELERATION = 2./3.
 
-  function glmoveobj(globj::GLobj,
+  function glmoveobj!(globj::GLobj,
                      movematrix::Mat{4,4,Float32},
                      movetime::Float64,
                      curtime::Float64,
