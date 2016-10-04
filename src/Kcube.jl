@@ -9,17 +9,26 @@ module Kcube
   export Board
   export GLModel
   export Anim
-
+  
+  import Reactive
+  import GLAbstraction
+  import GeometryTypes
   import GLFW
+  import ModernGL
+
+  const ga = GLAbstraction
+  const gt = GeometryTypes
   const fw = GLFW
+  const gl = ModernGL
 
   const CUBE_NB = 5
 
   function init_gl()
-
+    
+    window = GLtools.create_context()
     keymapping = Dict()
     function key_callback(window, key::Integer, scancode::Integer, action::Integer, mods::Integer)
-      if key in keymapping && action == fw.PRESS
+      if key in keys(keymapping) && action == fw.PRESS
         keymapping[key][1](keymapping[key][2])
       end
     end#function key_callback   window = GLModel.create_context()
@@ -64,12 +73,12 @@ module Kcube
                            ("moveupcursor!", true) => (Anim.MOVEUPMAT, 1., false),
                            ("movedowncursor!", true) => (Anim.MOVEDOWNMAT, 1., false),
                            ("moverightcursor!", true) => (Anim.MOVERIGHTMAT, 1., false),
-                           ("moverleftcursor!", true) => (Anim.MOVELEFTMAT, 1., false),
+                           ("moverleftcursor!", true) => (Anim.MOVELEFTMAT, 1., false)
                           )
 
   """
       function processboardevent(boardevents::Array{Tuple{name::String, args::Kcube, value::Bool}},
-                                  animevents::Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1})
+                                  animevents::Array{Tuple{Anim.GLobj, Mat{4,4,Float32}, Float64},1})
 
   Translate logic board events into animation event.
   
@@ -77,28 +86,30 @@ module Kcube
   where `or` maybe `{"up", "down", "right", "left"}`
     
   """
-  function processboardevent!(boardevents::Array{Tuple{name::String, args::Any, value::Bool}},
-                             animevents::Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1},
+  function processboardevent!(boardevents::Array{Tuple{String,Any,Bool},1},
+                             animevents::Array{Tuple{Anim.GLobj, gt.Mat{4,4,Float32}, Float64},1},
                              glcubes::Array{Anim.GLobj},
                              glpointer::Anim.GLobj)
-
-    for i in length(boardevents)
-      boardevent =  pop!(boardevents)
-      if ( boardevent[1], boardevent[3] ) in boardtoanim
-        modelmat, animetime, iscube = boardtoanim[ (boardevent[1] , boardevent[3]) ]
-        if iscube
-          event = (glcubes[boardevent[2].cubeid], modelmat, animetime )
-        else
-          event = (glpointer, modelmat, animetime)
+    len = length(boardevents)
+    if len != 0
+      for i in len
+        boardevent =  pop!(boardevents)
+        if ( boardevent[1], boardevent[3] ) in keys(boardtoanim)
+          modelmat, animetime, iscube = boardtoanim[ (boardevent[1] , boardevent[3]) ]
+          if iscube
+            event = (glcubes[boardevent[2].cubeid], modelmat, animetime )
+          else
+            event = (glpointer, modelmat, animetime)
+          end#if
+        push!(animevents, event)
         end#if
-      push!(animevents, event)
-      end#if
-    end#for
+      end#for
+    end#if
     return animevents
       
   end#function processboardevent!
 
-  function processanimevent!(animevents::Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1})
+  function processanimevent!(animevents::Array{Tuple{Anim.GLobj, gt.Mat{4,4,Float32}, Float64},1})
     
     for i in 1:length(animevents)
       animevent = pop!(animevents)
@@ -112,17 +123,18 @@ module Kcube
                   cubero::Any,
                   cubetrans,
                   pointerro::Any,
-                  pointertrans )
+                  pointertrans,
+                  projectionview )
 
     for glcube in glcubes
       modelmat = glcube.interpolation(glcube, time())
-      mvpmat = projection*view*modelmat
+      mvpmat = projectionview*modelmat
       push!(cubetrans, mvpmat)
       ga.render(cubero)
     end#for
 
-    modelmat = glpointer.interpolation(glpointer, time())
-    mvpmat = projection*view*modelmat #TODO finish to define projection and view matrix
+    modelmat = glcursor.interpolation(glcursor, time())
+    mvpmat = projectionview*modelmat #TODO finish to define projection and view matrix
     push!(pointertrans, mvpmat)
     Reactive.run_till_now()
     ga.render(pointerro)
@@ -149,6 +161,11 @@ module Kcube
     cursor, boardevents = init_board(keymaps)
     glcubes, glcursor, animevents = init_anim()
     cubero, cubetrans, pointerro, pointertrans = init_model()
+    
+    # TODO cleaner camera handling
+    projection = ga.perspectiveprojection(Float32, 90., 4./3., 1., 100.)
+    view = ga.lookat( gt.Vec3f0(10.,10., 10.), gt.Vec3f0(0.,0.,0.), gt.Vec3f0( 0.,1.,0.))
+    projectionview = projection*view
 
     while !GLFW.WindowShouldClose(window)
         t = time()
@@ -156,9 +173,9 @@ module Kcube
         gl.glClear(gl.GL_DEPTH_BUFFER_BIT)
 
         GLFW.PollEvents()
-        processboardevent!(boardevents, animevents, glcubes, glpointer )
+        processboardevent!(boardevents, animevents, glcubes, glcursor)
         processanimevent!(animevents)
-        render( glcubes, glcursor, cubero, cubetrans, pointerro, pointertrans )
+        render( glcubes, glcursor, cubero, cubetrans, pointerro, pointertrans, projectionview )
 
         GLFW.SwapBuffers(window)
         if GLFW.GetKey(window, GLFW.KEY_ESCAPE) == GLFW.PRESS

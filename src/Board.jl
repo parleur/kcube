@@ -14,7 +14,7 @@ module Board
   const FACE_GREEN = 5
   const FACE_BLACK = 6
   
-  const BoardEvents = Array{Tuple{name::String, args::Any, value::Bool}}
+  const BoardEvents = Array{Tuple{String, Any, Bool},1}
 
   """
       type Kcube
@@ -328,14 +328,14 @@ module Board
           if $movecube(grid, cursor.cube)
             cursor.position = (x,y,z)
             $rotatecube(cursor.cube)
-            push!(events,string($funcname), cube, true)
+            push!(grid.boardevents, (string($funcname), cursor.cube, true) )
             return true
           else
             cursor.position = (x,y,z)
             cursor.cube = grid.grid[x,y,z].cube
-            push!(grid.boardevents,string($funcname), cube, true)
+            push!(grid.boardevents, (string($funcname), cursor.cube, true) )
           end#if
-          push!(grid.boardevents,string($funcname), cube, false)
+          push!(grid.boardevents, (string($funcname), cursor.cube, false) )
         end#if
       end#function moveupcursor!
     end#block

@@ -1,7 +1,9 @@
 module Anim
 
-using GeometryTypes
-using GLAbstraction
+import GeometryTypes
+import GLAbstraction
+const gt = GeometryTypes
+const ga = GLAbstraction
   
   """
       type GLobj
@@ -18,9 +20,9 @@ using GLAbstraction
   const IDENTITYMAT = ga.rotationmatrix_x(Float32(0.))
 
   type GLobj
-    targetmodel::Mat{4,4,Float32}
-    lastmodel::Mat{4,4,Float32}
-    targetime::Float64# time() return Float64
+    targetmodel::gt.Mat{4,4,Float32}
+    lastmodel::gt.Mat{4,4,Float32}
+    targettime::Float64# time() return Float64
     lasttime::Float64
     interpolation::Function
 
@@ -30,29 +32,29 @@ using GLAbstraction
   end#type GLcube
 
   # globj, movematrix, time for the animation
-  AnimEvents = Array{Tuple{GLobj, Mat{4,4,Float32}, Float64},1}
+  AnimEvents = Array{Tuple{GLobj, gt.Mat{4,4,Float32}, Float64},1}
 
   const CUBE_SIZE = Float32(1.)
   
-  const MOVEUPMAT = translationmatrix_x(CUBE_SIZE)
-  const MOVEDOWNMAT = translationmatrix_x(-CUBE_SIZE)
-  const MOVELEFTMAT = translationmatrix_y(-CUBE_SIZE)
-  const MOVERIGHTMAT = translationmatrix_y(CUBE_SIZE)
+  const MOVEUPMAT = ga.translationmatrix_x(CUBE_SIZE)
+  const MOVEDOWNMAT = ga.translationmatrix_x(-CUBE_SIZE)
+  const MOVELEFTMAT = ga.translationmatrix_y(-CUBE_SIZE)
+  const MOVERIGHTMAT = ga.translationmatrix_y(CUBE_SIZE)
 
-  const MOVECUBEUPMAT = translationmatrix_x(CUBE_SIZE) *
-                        rotationmatrix_x(Float32(pi/2.))
-  const MOVECUBEDOWNMAT = translationmatrix_x(-CUBE_SIZE) *
-                          rotationmatrix_x(Float32(-pi/2.))
-  const MOVECUBELEFTMAT = translationmatrix_y(-CUBE_SIZE) *
-                          rotationmatrix_y(Float32(-pi/2.))
-  const MOVECUBERIGHTMAT = translationmatrix_y(CUBE_SIZE) *
-                           rotationmatrix_y(Float32(pi/2.))
+  const MOVECUBEUPMAT = ga.translationmatrix_x(CUBE_SIZE) *
+                        ga.rotationmatrix_x(Float32(pi/2.))
+  const MOVECUBEDOWNMAT = ga.translationmatrix_x(-CUBE_SIZE) *
+                          ga.rotationmatrix_x(Float32(-pi/2.))
+  const MOVECUBELEFTMAT = ga.translationmatrix_y(-CUBE_SIZE) *
+                          ga.rotationmatrix_y(Float32(-pi/2.))
+  const MOVECUBERIGHTMAT = ga.translationmatrix_y(CUBE_SIZE) *
+                           ga.rotationmatrix_y(Float32(pi/2.))
 
   const MOVETIME = 1.
   const ACCELERATION = 2./3.
 
   function glmoveobj!(globj::GLobj,
-                     movematrix::Mat{4,4,Float32},
+                     movematrix::gt.Mat{4,4,Float32},
                      movetime::Float64,
                      curtime::Float64,
                      animevents::AnimEvents)#time in s
@@ -74,7 +76,7 @@ using GLAbstraction
   end#function glmoveup
 
   function linearanim(globj::GLobj, curtime::Float64)
-    if curtime >= targettime
+    if curtime >= globj.targettime
       return globj.targetmodel
     else
       λ = (curtime - globj.lasttime )/(globj.targettime - globj.lasttime)

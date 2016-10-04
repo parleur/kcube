@@ -166,7 +166,7 @@ module GLModel
     const col = [ 43. , 176. , 194.]/256.
 
     color = gt.Vec3f0[ col, col, col, col,
-                      col, col]
+                      col]
 
     vertex_shader = ga.@vert_str("""
     #version 330

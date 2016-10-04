@@ -38,3 +38,5 @@ cursor = Board.Cursor(grid, cube1)
 @test Board.movedowncursor!(cursor)
 @test Board.moverightcursor!(cursor)
 @test Board.moveleftcursor!(cursor)
+
+Kcube.main()
