@@ -38,7 +38,7 @@ const quat = Quaternions
   AnimEvents = Array{Tuple{GLobj, gt.Mat{4,4,Float32}, Float64},1}
 
   const CUBE_SIZE = Float32(2.2)
-  const CURSORALT = Float32(4.)
+  const CURSORALT = Float32(-3.)
   
   const MOVEUPMAT = ga.translationmatrix_x(CUBE_SIZE)
   const MOVEDOWNMAT = ga.translationmatrix_x(-CUBE_SIZE)
@@ -47,12 +47,12 @@ const quat = Quaternions
   const MOVETOPMAT = ga.translationmatrix_z(CUBE_SIZE)
   const MOVEBOTTOMMAT = ga.translationmatrix_z(CUBE_SIZE)
 
-  const ROTATEUPQUA = quat.qrotation(Array{Float32}([0.,1.,0.]), Float32(pi/2.))
-  const ROTATEDOWNQUA = quat.qrotation(Array{Float32}([0.,1.,0.]), Float32(-pi/2.))
-  const ROTATELEFTQUA = quat.qrotation(Array{Float32}([1.,0.,0.]), Float32(pi/2.))
-  const ROTATERIGHTQUA = quat.qrotation(Array{Float32}([1.,0.,0.]), Float32(-pi/2.))
-  const ROTATETOPQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(-pi/2.))
-  const ROTATEBOTTOMQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(pi/2.))
+  const ROTATEUPQUA = quat.qrotation(Array{Float32}([0.,1.,0.]), Float32(-pi/2.))
+  const ROTATEDOWNQUA = quat.qrotation(Array{Float32}([0.,1.,0.]), Float32(pi/2.))
+  const ROTATELEFTQUA = quat.qrotation(Array{Float32}([1.,0.,0.]), Float32(-pi/2.))
+  const ROTATERIGHTQUA = quat.qrotation(Array{Float32}([1.,0.,0.]), Float32(pi/2.))
+  const ROTATETOPQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(pi/2.))
+  const ROTATEBOTTOMQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(-pi/2.))
 
   const MOVETIME = 1.
   const ACCELERATION = 2./3.

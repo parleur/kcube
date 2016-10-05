@@ -54,13 +54,18 @@ module Kcube
       Board.addcube!(grid)
     end#for
     cursor = Board.Cursor(grid, grid.cubes[1])
-
+  
+    function prtdebug(cursor)
+      debug = "position: "*string(cursor.cube.position)*"\n"
+      debug *= "orientation: "*string(cursor.cube.orientation)*"\n"
+      println(debug)
+    end
 
     merge!(keymap, Dict(fw.KEY_UP => (Board.moveupcursor!, cursor),
                             fw.KEY_DOWN => (Board.movedowncursor!, cursor),
                             fw.KEY_LEFT => (Board.moveleftcursor!,cursor),
                             fw.KEY_RIGHT => (Board.moverightcursor!,cursor),
-                            fw.KEY_P => (println, "hello")) )
+                            fw.KEY_P => (prtdebug, cursor)) )
 
     return cursor, cursor.grid.boardevents
 
@@ -166,7 +171,7 @@ module Kcube
     end
     x,y,z = cursor.cube.position
     glcursor = Anim.GLobj()
-    glcursor.lastmodel = ga.translationmatrix(gt.Vec3{Float32}(x,y,z+4.))
+    glcursor.lastmodel = ga.translationmatrix(gt.Vec3{Float32}(x,y,z + Anim.CURSORALT))
     return (glcubes, glcursor, animevents)
     
   end#function init_anim
@@ -180,8 +185,8 @@ module Kcube
     cubero, cubetrans, pointerro, pointertrans = init_model()
     
     # TODO cleaner camera handling
-    projection = ga.perspectiveprojection(Float32, 110., 4./3., 1., 100.)
-    view = ga.lookat( gt.Vec3f0(5.,5., 10.), gt.Vec3f0(0.,0.,0.), gt.Vec3f0( 0.,0.,1.))
+    projection = ga.perspectiveprojection(Float32, 90., 4./3., 1., 100.)
+    view = ga.lookat( gt.Vec3f0(10.,10., -15.), gt.Vec3f0(4.,4.,0.), gt.Vec3f0( 0.,0.,1.))
     projectionview = projection*view
 
     while !GLFW.WindowShouldClose(window)

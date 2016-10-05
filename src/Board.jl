@@ -169,11 +169,6 @@ module Board
 
   export(addcube!)
   
-  const UP = UInt8(1)
-  const DOWN = UInt8(2)
-  const RIGHT = UInt8(3)
-  const LEFT = UInt8(4)
-
   const RIGHT_ROTATION_TABLE = 
         Dict(
              (FACE_RED, FACE_BLACK)     =>  (FACE_GREEN, FACE_BLACK),
@@ -241,29 +236,29 @@ module Board
   const COORD_ROTATION_TABLE = #UPROTATION, RIGHTROTATION, TOPROTATION
       Dict(
              (FACE_RED, FACE_BLUE)      =>    (0,0,0),
-             (FACE_RED, FACE_BLACK)     =>    (0,0,1),
-             (FACE_RED, FACE_GREY)      =>    (0,0,3),
+             (FACE_RED, FACE_BLACK)     =>    (0,0,3),
+             (FACE_RED, FACE_GREY)      =>    (0,0,1),
              (FACE_RED, FACE_GREEN)     =>    (0,0,2),
-             (FACE_YELLOW, FACE_BLACK)  =>    (2,0,1),
+             (FACE_YELLOW, FACE_BLACK)  =>    (2,0,3),
              (FACE_YELLOW, FACE_BLUE)   =>    (2,0,2),
-             (FACE_YELLOW, FACE_GREY)   =>    (2,0,3),
+             (FACE_YELLOW, FACE_GREY)   =>    (2,0,1),
              (FACE_YELLOW, FACE_GREEN)  =>    (2,0,0),
-             (FACE_GREEN, FACE_BLACK)   =>    (3,0,1),
+             (FACE_GREEN, FACE_BLACK)   =>    (3,0,3),
              (FACE_GREEN, FACE_RED)     =>    (3,0,0),
-             (FACE_GREEN, FACE_GREY)    =>    (3,0,3),
+             (FACE_GREEN, FACE_GREY)    =>    (3,0,1),
              (FACE_GREEN, FACE_YELLOW)  =>    (3,0,2),
-             (FACE_BLUE, FACE_BLACK)    =>    (1,0,1),
+             (FACE_BLUE, FACE_BLACK)    =>    (1,0,3),
              (FACE_BLUE, FACE_RED)      =>    (1,0,2),
-             (FACE_BLUE, FACE_GREY)     =>    (1,0,3),
+             (FACE_BLUE, FACE_GREY)     =>    (1,0,1),
              (FACE_BLUE, FACE_YELLOW)   =>    (1,0,0),
              (FACE_GREY, FACE_BLUE)     =>    (0,3,0),
-             (FACE_GREY, FACE_YELLOW)   =>    (0,3,3),
+             (FACE_GREY, FACE_YELLOW)   =>    (0,3,1),
              (FACE_GREY, FACE_GREEN)    =>    (0,3,2),
-             (FACE_GREY, FACE_RED)      =>    (0,3,1),
+             (FACE_GREY, FACE_RED)      =>    (0,3,3),
              (FACE_BLACK, FACE_BLUE)    =>    (0,1,0),
-             (FACE_BLACK, FACE_YELLOW)  =>    (0,1,1),
+             (FACE_BLACK, FACE_YELLOW)  =>    (0,1,3),
              (FACE_BLACK, FACE_GREEN)   =>    (0,1,2),
-             (FACE_BLACK, FACE_RED)     =>    (0,1,3)
+             (FACE_BLACK, FACE_RED)     =>    (0,1,1)
             )
 
   function getrotatecoord(cube::Kcube)

@@ -59,33 +59,33 @@ module GLModel
     # The six point are duplicted into six independent faces
     # Needed because at corner same point have three different colors depending
     # on cube faces
-    vertex_positions = gt.Point{3,Float32}[A,B,G,H,#0,1,2,3,
-                                        A,B,C,D,#4,5,6,7,
-                                        A,D,E,H,#8,9,10,11,
-                                        B,C,F,G,#12,13,14,15,
-                                        E,F,G,H,#16,17,18,19,
-                                        D,C,E,F]#20,21,22,23,
+    vertex_positions = gt.Point{3,Float32}[A,B,G,H,#0,1,2,3, YELLOW
+                                        A,B,C,D,#4,5,6,7,   BLUE
+                                        A,D,E,H,#8,9,10,11, BLACK
+                                        B,C,F,G,#12,13,14,15, GREY
+                                        E,F,G,H,#16,17,18,19, GREEN
+                                        D,C,E,F]#20,21,22,23, RED
 
     # Each square is two triangles
-    elements = gt.Face{3,UInt32,-1}[(0,1,2),#Face 1
+    elements = gt.Face{3,UInt32,-1}[(0,1,2),#Face YELLOW
                                  (0,2,3),
-                                 (4,5,6),#Face 2
+                                 (4,5,6),#Face BLUE
                                  (4,6,7),
-                                 (8,9,10),#Face 3
+                                 (8,9,10),#Face BLACK
                                  (8,10,11),
-                                 (12,13,14),#Face 4
+                                 (12,13,14),#Face GREY
                                  (12,14,15),
-                                 (16,17,18),#Face 5
+                                 (16,17,18),#Face GREEN
                                  (16,18,19),
-                                 (20,21,22),# Face 6
+                                 (20,21,22),# Face RED
                                  (21,22,23)]
     #Face color
-    col1 = [ 50. , 107., 211.]/256.
-    col2 = [ 212 , 91. , 51. ]/256.
-    col3 = [ 204. ,212. , 51.]/256.
-    col4 = [ 194. , 42. , 84.]/256.
-    col5 = [ 43. , 194. , 91.]/256.
-    col6 = [ 43. , 176. , 194.]/256.
+    col1 = [ 234. , 217., 22. ]/256.
+    col2 = [ 48. , 54. , 207. ]/256.
+    col3 = [ 86. , 34. , 156. ]/256.
+    col4 = [ 109. , 109. , 109. ]/256.
+    col5 = [ 53. , 207. , 48. ]/256.
+    col6 = [ 153. , 40. , 44.]/256.
 
     color = gt.Vec3f0[ col1, col1, col1, col1,
                     col2, col2, col2, col2,
@@ -148,11 +148,11 @@ module GLModel
     
     const BS = 2.
     # The six main points of the pointer
-    A = BS*[-0.25,-0.25, 0.35] 
-    B = BS*[-0.25, 0.25, 0.35]
-    C = BS*[ 0.25, 0.25, 0.35]
-    D = BS*[ 0.25,-0.25, 0.35]
-    E = BS*[ 0.  , 0.  ,-0.35]
+    A = BS*[-0.25,-0.25,-0.35] 
+    B = BS*[-0.25, 0.25,-0.35]
+    C = BS*[ 0.25, 0.25,-0.35]
+    D = BS*[ 0.25,-0.25,-0.35]
+    E = BS*[ 0.  , 0.  , 0.35]
 
     vertex_positions = gt.Point{3,Float32}[A,B,C,D,E]
 
