@@ -60,10 +60,10 @@ module GLModel
     # Needed because at corner same point have three different colors depending
     # on cube faces
     vertex_positions = gt.Point{3,Float32}[A,B,G,H,#0,1,2,3, YELLOW
-                                        A,B,C,D,#4,5,6,7,   BLUE
-                                        A,D,E,H,#8,9,10,11, BLACK
-                                        B,C,F,G,#12,13,14,15, GREY
-                                        E,F,G,H,#16,17,18,19, GREEN
+                                        A,B,C,D,#4,5,6,7,   GREY
+                                        A,D,E,H,#8,9,10,11, BLUE
+                                        B,C,F,G,#12,13,14,15, GREEN
+                                        E,F,G,H,#16,17,18,19, BLACK
                                         D,C,E,F]#20,21,22,23, RED
 
     # Each square is two triangles
@@ -80,12 +80,12 @@ module GLModel
                                  (20,21,22),# Face RED
                                  (21,22,23)]
     #Face color
-    col1 = [ 234. , 217., 22. ]/256.
-    col2 = [ 48. , 54. , 207. ]/256.
-    col3 = [ 86. , 34. , 156. ]/256.
-    col4 = [ 109. , 109. , 109. ]/256.
-    col5 = [ 53. , 207. , 48. ]/256.
-    col6 = [ 153. , 40. , 44.]/256.
+    col1 = [ 234. , 217., 22. ]/256.#YELLOW
+    col2 = [ 109. , 109. , 109. ]/256.#GREY
+    col3 = [ 48. , 54. , 207. ]/256.#BLUE
+    col4 = [ 53. , 207. , 48. ]/256.#GREEN
+    col5 = [ 86. , 34. , 156. ]/256.#BLACK
+    col6 = [ 153. , 40. , 44.]/256.#RED
 
     color = gt.Vec3f0[ col1, col1, col1, col1,
                     col2, col2, col2, col2,
