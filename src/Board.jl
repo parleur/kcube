@@ -237,7 +237,38 @@ module Board
   const _ru = UP_ROTATION_TABLE
   const DOWN_ROTATION_TABLE = 
         Dict(key => _ru[_ru[_ru[key]]] for key = keys(_rr))
+  
+  const COORD_ROTATION_TABLE = #UPROTATION, RIGHTROTATION, TOPROTATION
+      Dict(
+             (FACE_RED, FACE_BLUE)      =>    (0,0,0),
+             (FACE_RED, FACE_BLACK)     =>    (0,0,1),
+             (FACE_RED, FACE_GREY)      =>    (0,0,3),
+             (FACE_RED, FACE_GREEN)     =>    (0,0,2),
+             (FACE_YELLOW, FACE_BLACK)  =>    (2,0,1),
+             (FACE_YELLOW, FACE_BLUE)   =>    (2,0,2),
+             (FACE_YELLOW, FACE_GREY)   =>    (2,0,3),
+             (FACE_YELLOW, FACE_GREEN)  =>    (2,0,0),
+             (FACE_GREEN, FACE_BLACK)   =>    (3,0,1),
+             (FACE_GREEN, FACE_RED)     =>    (3,0,0),
+             (FACE_GREEN, FACE_GREY)    =>    (3,0,3),
+             (FACE_GREEN, FACE_YELLOW)  =>    (3,0,2),
+             (FACE_BLUE, FACE_BLACK)    =>    (1,0,1),
+             (FACE_BLUE, FACE_RED)      =>    (1,0,2),
+             (FACE_BLUE, FACE_GREY)     =>    (1,0,3),
+             (FACE_BLUE, FACE_YELLOW)   =>    (1,0,0),
+             (FACE_GREY, FACE_BLUE)     =>    (0,3,0),
+             (FACE_GREY, FACE_YELLOW)   =>    (0,3,3),
+             (FACE_GREY, FACE_GREEN)    =>    (0,3,2),
+             (FACE_GREY, FACE_RED)      =>    (0,3,1),
+             (FACE_BLACK, FACE_BLUE)    =>    (0,1,0),
+             (FACE_BLACK, FACE_YELLOW)  =>    (0,1,1),
+             (FACE_BLACK, FACE_GREEN)   =>    (0,1,2),
+             (FACE_BLACK, FACE_RED)     =>    (0,1,3)
+            )
 
+  function getrotatecoord(cube::Kcube)
+    return COORD_ROTATION_TABLE[cube.orientation]
+  end#function getrotatecoordcube
 
   function rotateupcube!(cube::Kcube)#never failing function
     cube.orientation = UP_ROTATION_TABLE[cube.orientation]
@@ -255,10 +286,11 @@ module Board
     cube.orientation = RIGHT_ROTATION_TABLE[cube.orientation]
   end#function rotaterightcube
 
-  for (funcname, changedline) in [(:moveupcube!, :(x+=1)),
-                                (:movedowncube!, :(x-=1)),
-                                (:moverightcube!, :(y+=1)),
-                                (:moveleftcube!, :(y-=1))]
+  for (funcstr, changedline) in [("moveupcube!", :(x+=1)),
+                                ("movedowncube!", :(x-=1)),
+                                ("moverightcube!", :(y+=1)),
+                                ("moveleftcube!", :(y-=1))]
+    funcname = Symbol(funcstr)
     @eval begin
       function ($funcname)(grid::KcubeGrid, cube::Kcube)
         x,y,z = deepcopy(cube.position)
@@ -268,10 +300,10 @@ module Board
             grid.grid[x,y,z].cube = cube;
             grid.grid[cube.position...].cube = KCUBE_NOCUBE;
             cube.position = (x, y, z);
-            push!(grid.boardevents,(string($funcname), cube, true))
+            push!(grid.boardevents,($funcstr, cube, true))
             return true;
         else
-            push!(grid.boardevents,(string($funcname), cube, false))
+            push!(grid.boardevents,($funcstr, cube, false))
             return false;
         end
       end#function
@@ -316,7 +348,8 @@ module Board
                                ("down", :(x-=1)),
                                ("right", :(y+=1)),
                                 ("left", :(y-=1))]
-    funcname = Symbol(string("move",name,"cursor!"))
+    funcstr = string("move",name,"cursor!")
+    funcname = Symbol(funcstr)
     movecube = Symbol(string("move",name,"cube!")) 
     rotatecube = Symbol(string("rotate",name,"cube!")) 
     @eval begin
@@ -328,14 +361,14 @@ module Board
           if $movecube(grid, cursor.cube)
             cursor.position = (x,y,z)
             $rotatecube(cursor.cube)
-            push!(grid.boardevents, (string($funcname), cursor.cube, true) )
+            push!(grid.boardevents, ($funcstr, cursor.cube, true) )
             return true
           else
             cursor.position = (x,y,z)
             cursor.cube = grid.grid[x,y,z].cube
-            push!(grid.boardevents, (string($funcname), cursor.cube, true) )
+            push!(grid.boardevents, ($funcstr, cursor.cube, true) )
           end#if
-          push!(grid.boardevents, (string($funcname), cursor.cube, false) )
+          push!(grid.boardevents, ($funcstr, cursor.cube, false) )
         end#if
       end#function moveupcursor!
     end#block

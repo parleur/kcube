@@ -146,7 +146,7 @@ module GLModel
     vao = gl.glGenVertexArrays()
     gl.glBindVertexArray(vao)
     
-    const BS = 1.
+    const BS = 2.
     # The six main points of the pointer
     A = BS*[-0.25,-0.25, 0.35] 
     B = BS*[-0.25, 0.25, 0.35]
