@@ -21,55 +21,7 @@ module Kcube
   const fw = GLFW
   const gl = ModernGL
 
-  const CUBE_NB = 5
 
-  function init_gl()
-    
-    window = GLtools.create_context()
-    keymapping = Dict()
-    function key_callback(window, key::Integer, scancode::Integer, action::Integer, mods::Integer)
-      if key in keys(keymapping) && action == fw.PRESS
-        keymapping[key][1](keymapping[key][2])
-      end
-    end#function key_callback   window = GLModel.create_context()
-
-    fw.SetKeyCallback(window, key_callback)
-    return window, keymapping
-
-  end#function init_gl
-  
-  function init_model()
-
-    cubero, cubetrans = GLModel.create_cube()
-    pointerro, pointertrans = GLModel.create_pointer()
-    return cubero, cubetrans, pointerro, pointertrans
-    
-  end#function init_model
-  
-
-  function init_board(keymap::Dict{Any, Any})
-
-    grid = Board.KcubeGrid((4,4,1))
-    for i in 1:CUBE_NB
-      Board.addcube!(grid)
-    end#for
-    cursor = Board.Cursor(grid, grid.cubes[1])
-  
-    function prtdebug(cursor)
-      debug = "position: "*string(cursor.cube.position)*"\n"
-      debug *= "orientation: "*string(cursor.cube.orientation)*"\n"
-      println(debug)
-    end
-
-    merge!(keymap, Dict(fw.KEY_UP => (Board.moveupcursor!, cursor),
-                            fw.KEY_DOWN => (Board.movedowncursor!, cursor),
-                            fw.KEY_LEFT => (Board.moveleftcursor!,cursor),
-                            fw.KEY_RIGHT => (Board.moverightcursor!,cursor),
-                            fw.KEY_P => (prtdebug, cursor)) )
-
-    return cursor, cursor.grid.boardevents
-
-  end#function init_board
   
   const boardtoanim = Dict(
                            ("moveupcube!", true) => ( 1., true),
@@ -162,7 +114,7 @@ module Kcube
     grid = cursor.grid
     animevents = Anim.AnimEvents()
     glcubes = Array{Anim.GLobj,1}()
-    for i in 1:CUBE_NB
+    for i in 1:Board.CUBE_NB
       x,y,z = grid.cubes[i].position
       glcube = Anim.GLobj()
       glcube.lastmodel = ga.translationmatrix(gt.Vec3{Float32}(Anim.CUBE_SIZE*[x,y,z]))
@@ -179,10 +131,10 @@ module Kcube
 
   function main()
     
-    window, keymaps = init_gl()
-    cursor, boardevents = init_board(keymaps)
+    window, keymaps = GLtools.init_gl()
+    cursor, boardevents = Board.init_board(keymaps)
     glcubes, glcursor, animevents = init_anim(cursor)
-    cubero, cubetrans, pointerro, pointertrans = init_model()
+    cubero, cubetrans, pointerro, pointertrans = GLModel.init_model()
     
     # TODO cleaner camera handling
     projection = ga.perspectiveprojection(Float32, 90., 4./3., 1., 100.)

@@ -1,6 +1,7 @@
 module Board
 
-
+  import GLFW
+  const fw = GLFW
   
   const CUBE_NORMAL = 1  
   const CUBE_NOCUBE = 0
@@ -14,7 +15,34 @@ module Board
   const FACE_GREEN = 5
   const FACE_BLACK = 6
   
+  const GRIDSIZE = (5,5,1)
+  const CUBE_NB = 5
+
   const BoardEvents = Array{Tuple{String, Any, Bool},1}
+
+  function init_board(keymap::Dict{Any, Any})
+
+    grid = KcubeGrid(GRIDSIZE)
+    for i in 1:CUBE_NB
+      addcube!(grid)
+    end#for
+    cursor = Cursor(grid, grid.cubes[1])
+  
+    function prtdebug(cursor)
+      debug = "position: "*string(cursor.cube.position)*"\n"
+      debug *= "orientation: "*string(cursor.cube.orientation)*"\n"
+      println(debug)
+    end
+
+    merge!(keymap, Dict(fw.KEY_UP => (moveupcursor!, cursor),
+                            fw.KEY_DOWN => (movedowncursor!, cursor),
+                            fw.KEY_LEFT => (moveleftcursor!,cursor),
+                            fw.KEY_RIGHT => (moverightcursor!,cursor),
+                            fw.KEY_P => (prtdebug, cursor)) )
+
+    return cursor, cursor.grid.boardevents
+
+  end#function init_board
 
   """
       type Kcube
