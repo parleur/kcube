@@ -24,14 +24,14 @@ module Kcube
 
   
   const boardtoanim = Dict(
-                           ("moveupcube!", true) => ( 1., true),
-                           ("movedowncube!", true) => ( 1., true),
-                           ("moveleftcube!", true) => ( 1., true),
-                           ("moverightcube!", true) => ( 1., true),
-                           ("moveupcursor!", true) => ( 1., false),
-                           ("movedowncursor!", true) => ( 1., false),
-                           ("moverightcursor!", true) => ( 1., false),
-                           ("moveleftcursor!", true) => ( 1., false)
+                           ("moveupcube!", true) => ( Anim.MOVETIME, true),
+                           ("movedowncube!", true) => ( Anim.MOVETIME, true),
+                           ("moveleftcube!", true) => ( Anim.MOVETIME, true),
+                           ("moverightcube!", true) => ( Anim.MOVETIME, true),
+                           ("moveupcursor!", true) => ( Anim.MOVETIME, false),
+                           ("movedowncursor!", true) => ( Anim.MOVETIME, false),
+                           ("moverightcursor!", true) => ( Anim.MOVETIME, false),
+                           ("moveleftcursor!", true) => ( Anim.MOVETIME, false)
                           )
 
   """
