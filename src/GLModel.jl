@@ -11,34 +11,41 @@ module GLModel
   const gt = GeometryTypes
   const ga = GLAbstraction
 
-  # La fonction de création de contexte, retourne une fenêtre GLFW
-  function create_context()
-    window_hint = [
-      ( fw.SAMPLES,   4), # antialiasing 4
-      ( fw.DEPTH_BITS,  32), # taille du buffer de profondeur
-      ( fw.ALPHA_BITS,  8),
-      ( fw.RED_BITS,    8),
-      ( fw.BLUE_BITS,   8),
-      ( fw.STENCIL_BITS,  8),
-      ( fw.AUX_BUFFERS, 0),
-      ( fw.CONTEXT_VERSION_MAJOR, 3 ), #minimum OpenGL v.3
-      ( fw.CONTEXT_VERSION_MINOR, 3 ), # same for minimum version 
-      ( fw.OPENGL_PROFILE, fw.OPENGL_CORE_PROFILE ),
-      ( fw.OPENGL_FORWARD_COMPAT, gl.GL_TRUE),
-      ( fw.RESIZABLE, gl.GL_FALSE ),
-    ]
+  ## La fonction de création de contexte, retourne une fenêtre GLFW
+  #function create_context()
+    #window_hint = [
+      #( fw.SAMPLES,   4), # antialiasing 4
+      #( fw.DEPTH_BITS,  32), # taille du buffer de profondeur
+      #( fw.ALPHA_BITS,  8),
+      #( fw.RED_BITS,    8),
+      #( fw.BLUE_BITS,   8),
+      #( fw.STENCIL_BITS,  8),
+      #( fw.AUX_BUFFERS, 0),
+      #( fw.CONTEXT_VERSION_MAJOR, 3 ), #minimum OpenGL v.3
+      #( fw.CONTEXT_VERSION_MINOR, 3 ), # same for minimum version 
+      #( fw.OPENGL_PROFILE, fw.OPENGL_CORE_PROFILE ),
+      #( fw.OPENGL_FORWARD_COMPAT, gl.GL_TRUE),
+      #( fw.RESIZABLE, gl.GL_FALSE ),
+    #]
 
-    for (key, value) in window_hint
-      fw.WindowHint( key, value )
-    end
+    #for (key, value) in window_hint
+      #fw.WindowHint( key, value )
+    #end
 
-    window = fw.CreateWindow( 800 , 600, "Kcube revenge")
-    fw.MakeContextCurrent( window )
-    fw.SetInputMode( window, fw.STICKY_KEYS, gl.GL_TRUE )
-    gl.glClearColor(1,1,1,1)
-    return window
-  end
+    #window = fw.CreateWindow( 800 , 600, "Kcube revenge")
+    #fw.MakeContextCurrent( window )
+    #fw.SetInputMode( window, fw.STICKY_KEYS, gl.GL_TRUE )
+    #gl.glClearColor(1,1,1,1)
+    #return window
+  #end
 
+  function init_model()
+
+    cubero, cubetrans = create_cube()
+    pointerro, pointertrans = create_pointer()
+    return cubero, cubetrans, pointerro, pointertrans
+    
+  end#function init_model
 
   function create_cube()
     vao = gl.glGenVertexArrays()
