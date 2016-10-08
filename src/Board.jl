@@ -8,12 +8,12 @@ module Board
     
   # Arbitrary colors (coresponding with a cube on my desktop)
   # The order depart from a face, going altenatively bottom then right (and so on ..)
-  const FACE_RED = 1
-  const FACE_BLUE = 2
-  const FACE_GREY = 3
-  const FACE_YELLOW = 4
-  const FACE_GREEN = 5
-  const FACE_BLACK = 6
+  const FACE_RED = :facered
+  const FACE_BLUE = :faceblue
+  const FACE_GREY = :facegrey
+  const FACE_YELLOW = :faceyellow
+  const FACE_GREEN = :facegreen
+  const FACE_BLACK = :faceblack
   
   const GRIDSIZE = (5,5,1)
   const CUBE_NB = 5
@@ -62,8 +62,8 @@ module Board
     cubeid::Integer
     cubetype::Integer
     position::Tuple{Integer, Integer, Integer}#position
-    orientation::Tuple{Integer, Integer}#first the top face, then the front face
-    function Kcube(cubeid::Integer, cubetype::Integer, position::Tuple{Integer,Integer,Integer},orientation::Tuple{Integer,Integer})
+    orientation::Tuple{Symbol, Symbol}#first the top face, then the front face
+    function Kcube(cubeid::Integer, cubetype::Integer, position::Tuple{Integer,Integer,Integer},orientation::Tuple{Symbol,Symbol})
       new(cubeid, cubetype, position, orientation)
     end#function Kcube
     function Kcube(cubeid::Integer, position::Tuple{Integer, Integer, Integer})

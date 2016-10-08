@@ -55,8 +55,8 @@ const quat = Quaternions
   const ROTATETOPQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(pi/2.))
   const ROTATEBOTTOMQUA = quat.qrotation(Array{Float32}([0.,0.,1.]), Float32(-pi/2.))
 
-  const MOVETIME = 1.
-  const ACCELERATION = 2./3.
+  const MOVETIME = 0.5
+  const ACCELERATION = 3./4. # must be < 1.
 
   function glmoveobj!(globj::GLobj,
                      newtarget::gt.Mat{4,4,Float32},
